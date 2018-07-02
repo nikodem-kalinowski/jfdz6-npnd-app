@@ -9,6 +9,7 @@ import {
   FormGroup,
   Input
 } from 'reactstrap';
+import { runInThisContext } from 'vm';
 
 class Costs extends React.Component {
   state = {
@@ -80,12 +81,22 @@ class Costs extends React.Component {
     });
   };
 
+  componentDidUpdate() {
+    localStorage.setItem('costs', JSON.stringify(this.state.costsRecords));
+  }
+
+  componentDidMount() {
+    this.setState({
+      costsRecords: JSON.parse(localStorage.getItem('costs'))
+    });
+  }
+
   handleAddCostRecord = e => {
     e.preventDefault();
     const costAmmount = this.state.costAmmount;
     const selectedCostGroup = this.state.selectedCostGroup;
     const id =
-      this.state.costsRecords.length > 0
+      this.state.costsRecords && this.state.costsRecords.length > 0
         ? this.state.costsRecords[this.state.costsRecords.length - 1].id + 1
         : 1;
 
@@ -119,7 +130,8 @@ class Costs extends React.Component {
           <button type="submit">Add cost group</button>
         </form>
         <form onSubmit={this.handleAddCostRecord}>
-          Ammount <input type="number" onChange={this.handleCostAmmount} />
+          Ammount{' '}
+          <input type="number" step="0.01" onChange={this.handleCostAmmount} />
           Select group<select name="" id="" onChange={this.handleChange}>
             <option defaultValue="">-</option>
             {this.state.costsGroup.map(cost => (
