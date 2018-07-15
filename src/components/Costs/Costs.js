@@ -33,7 +33,7 @@ class Costs extends React.Component {
     ],
     costsRecords: [],
     inputValue: '',
-    costAmount: 0,
+    costAmount: '',
     selectedCostGroup: ''
   };
   handleChange = e => {
@@ -95,20 +95,25 @@ class Costs extends React.Component {
 
   handleAddCostRecord = e => {
     e.preventDefault();
-    const costAmount = this.state.costAmount;
+    const costAmount = this.state.costAmount * 1;
     const selectedCostGroup = this.state.selectedCostGroup;
     const id =
       this.state.costsRecords && this.state.costsRecords.length > 0
         ? this.state.costsRecords[this.state.costsRecords.length - 1].id + 1
         : 1;
 
-    this.setState({
-      costsRecords: this.state.costsRecords.concat({
-        id,
-        costAmount,
-        costGroup: selectedCostGroup
-      })
-    });
+    if (costAmount > 0 && selectedCostGroup.length > 0) {
+      this.setState({
+        costsRecords: this.state.costsRecords.concat({
+          id,
+          costAmount,
+          costGroup: selectedCostGroup
+        }),
+        costAmount: ''
+      });
+    } else {
+      console.log('NOPE');
+    }
   };
 
   render() {
@@ -170,7 +175,12 @@ class Costs extends React.Component {
         </form>
         <form onSubmit={this.handleAddCostRecord}>
           Amount{' '}
-          <input type="number" step="0.01" onChange={this.handelCostAmount} />
+          <input
+            type="number"
+            step="0.01"
+            onChange={this.handelCostAmount}
+            value={this.state.costAmount}
+          />
           Select group<select name="" id="" onChange={this.handleChange}>
             <option defaultValue="">-</option>
             {this.state.costsGroup.map(cost => (
