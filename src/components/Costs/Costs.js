@@ -33,7 +33,7 @@ class Costs extends React.Component {
     ],
     costsRecords: [],
     inputValue: '',
-    costAmmount: 0,
+    costAmount: 0,
     selectedCostGroup: ''
   };
   handleChange = e => {
@@ -73,39 +73,39 @@ class Costs extends React.Component {
     });
   };
 
-  handleCostAmmount = e => {
-    const costAmmount = e.currentTarget.value;
+  handelCostAmount = e => {
+    const costAmount = e.currentTarget.value;
 
     this.setState({
-      costAmmount
+      costAmount
     });
   };
 
   componentDidUpdate() {
     localStorage.setItem('costs', JSON.stringify(this.state.costsRecords));
+    localStorage.setItem('costsGroups', JSON.stringify(this.state.costsGroup));
   }
 
   componentDidMount() {
     this.setState({
-      costsRecords: JSON.parse(localStorage.getItem('costs'))
+      costsRecords: JSON.parse(localStorage.getItem('costs')),
+      costsGroup: JSON.parse(localStorage.getItem('costsGroups'))
     });
   }
 
   handleAddCostRecord = e => {
     e.preventDefault();
-    const costAmmount = this.state.costAmmount;
+    const costAmount = this.state.costAmount;
     const selectedCostGroup = this.state.selectedCostGroup;
     const id =
       this.state.costsRecords && this.state.costsRecords.length > 0
         ? this.state.costsRecords[this.state.costsRecords.length - 1].id + 1
         : 1;
 
-    console.log(id, costAmmount, selectedCostGroup);
-
     this.setState({
       costsRecords: this.state.costsRecords.concat({
         id,
-        costAmmount,
+        costAmount,
         costGroup: selectedCostGroup
       })
     });
@@ -119,7 +119,46 @@ class Costs extends React.Component {
           color: 'white'
         }}
       >
-        Costs
+        <div>
+          Choose cost group Select group<select
+            name=""
+            id=""
+            onChange={this.handleChange}
+          >
+            <option defaultValue="">-</option>
+            {this.state.costsGroup.map(cost => (
+              <option key={cost.id} value={cost.name}>
+                {cost.name}
+              </option>
+            ))}
+          </select>
+        </div>
+        Costs Sum of {`${this.state.selectedCostGroup}`}:{' '}
+        {this.state.costsRecords.reduce(
+          (accu, prev) =>
+            prev.costGroup === this.state.selectedCostGroup
+              ? accu + prev.costAmount * 1
+              : accu,
+          0
+        )}
+        <br />
+        Zostało w budżecie dla Spożywka:
+        {this.state.costsRecords.reduce(
+          (accu, prev) =>
+            prev.costGroup === this.state.selectedCostGroup
+              ? accu - prev.costAmount * 1
+              : accu,
+          1000
+        )}
+        <br />
+        Obecny trend dniowy:
+        {this.state.costsRecords.reduce(
+          (accu, prev) =>
+            prev.costGroup === this.state.selectedCostGroup
+              ? accu + prev.costAmount * 1
+              : accu,
+          0
+        ) / 12}
         <form action="" onSubmit={this.handleSubmit}>
           Name of cost group{' '}
           <input
@@ -130,8 +169,8 @@ class Costs extends React.Component {
           <button type="submit">Add cost group</button>
         </form>
         <form onSubmit={this.handleAddCostRecord}>
-          Ammount{' '}
-          <input type="number" step="0.01" onChange={this.handleCostAmmount} />
+          Amount{' '}
+          <input type="number" step="0.01" onChange={this.handelCostAmount} />
           Select group<select name="" id="" onChange={this.handleChange}>
             <option defaultValue="">-</option>
             {this.state.costsGroup.map(cost => (
@@ -155,7 +194,7 @@ class Costs extends React.Component {
               ? this.state.costsRecords.map((record, index) => (
                   <tr key={record.id}>
                     <td>{index + 1}</td>
-                    <td>{record.costAmmount}</td>
+                    <td>{record.costAmount}</td>
                     <td>{record.costGroup}</td>
                   </tr>
                 ))
